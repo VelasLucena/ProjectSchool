@@ -12,8 +12,8 @@ namespace ApiSchool.Services.Interfaces
 
         Task<List<UserModel>> GetUsers();
 
-        Task<UserModel> GetUserById(int id);
+        Task<UserModel> GetUserById(int? id);
 
-        Task<List<UserModel>> GetUserByName(string name);
+        Task<List<UserModel>> GetUserByName(string? name);
     }
 }

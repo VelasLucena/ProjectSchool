@@ -9,8 +9,8 @@ namespace ApiSchool.Mapper
     {
         public static UserModel CreateUserMapper(UserModel user)
         {
-            user.CreateUserId = Convert.ToInt32(AppStartUp.GetSettingsApp(AppSettingsKeys.DefaultUserId));
-            user.CreateTime = DateTime.Now;
+            user.UpdateUserId = Convert.ToInt32(AppStartUp.GetSettingsApp(AppSettingsKeys.DefaultUserId));
+            user.UpdateTime = DateTime.Now;
             return user;
         }
     }

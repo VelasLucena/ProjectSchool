@@ -23,7 +23,7 @@ namespace ApiSchool.Utils
             foreach(PropertyInfo propertyInfo in configurationModel.GetType().GetProperties())
             {
                 if (propertyInfo.Name == Enum.GetName(key.GetType(), key))
-                    return propertyInfo.GetValue(configurationModel.LocalPathLog).ToString();
+                    return propertyInfo.GetValue(configurationModel).ToString();
             }
 
             if (result == null)
