@@ -1,19 +1,21 @@
 ﻿using ApiSchool.Mapper;
 using ApiSchool.Models;
 using ApiSchool.Services.Interfaces;
-using ApiSchool.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Options;
 using System;
+using System.Net.Mime;
 using System.Runtime;
 using static ApiSchool.Models.Enum.SystemEnum;
 
 namespace ApiSchool.Controllers
 {
-    [Route("api/[controller]/[action]")]
     [ApiController]
+    [Route("api/[controller]/[action]")]
+    [Consumes(MediaTypeNames.Application.Json)]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ProfileController : Controller
     {
@@ -35,7 +37,7 @@ namespace ApiSchool.Controllers
 
                 listUsers = await _profileService.GetUsers();
 
-                if(listUsers.FirstOrDefault() == null)
+                if (listUsers.FirstOrDefault() == null)
                     return NotFound();
 
                 return Ok(listUsers);
@@ -45,7 +47,7 @@ namespace ApiSchool.Controllers
                 LogExceptionModel logException = new LogExceptionModel();
                 logException.Error = ex.ToString() + Environment.NewLine;
                 logException.CreateTime = DateTime.Now;
-                logException.CreateUserId = Convert.ToInt32(AppStartUp.GetSettingsApp(AppSettingsKeys.DefaultUserId));
+                logException.CreateUserId = Convert.ToInt32(AppSettings.DefaultUserId);
                 await _systemService.InsertLogException(logException);
                 return BadRequest("Houve um erro");
             }
@@ -60,7 +62,7 @@ namespace ApiSchool.Controllers
 
                 user = await _profileService.GetUserById(id);
 
-                if (user == null) 
+                if (user == null)
                     return NotFound();
 
                 return Ok(user);
@@ -70,7 +72,7 @@ namespace ApiSchool.Controllers
                 LogExceptionModel logException = new LogExceptionModel();
                 logException.Error = ex.ToString() + Environment.NewLine;
                 logException.CreateTime = DateTime.Now;
-                logException.CreateUserId = Convert.ToInt32(AppStartUp.GetSettingsApp(AppSettingsKeys.DefaultUserId));
+                logException.CreateUserId = Convert.ToInt32(AppSettings.DefaultUserId);
                 await _systemService.InsertLogException(logException);
                 return BadRequest("Houve um erro");
             }
@@ -84,7 +86,7 @@ namespace ApiSchool.Controllers
                 List<UserModel> users = new List<UserModel>();
                 users = await _profileService.GetUserByName(name);
 
-                if(users.FirstOrDefault() == null)
+                if (users.FirstOrDefault() == null)
                     return NotFound();
 
                 return Ok(users);
@@ -94,7 +96,7 @@ namespace ApiSchool.Controllers
                 LogExceptionModel logException = new LogExceptionModel();
                 logException.Error = ex.ToString() + Environment.NewLine;
                 logException.CreateTime = DateTime.Now;
-                logException.CreateUserId = Convert.ToInt32(AppStartUp.GetSettingsApp(AppSettingsKeys.DefaultUserId));
+                logException.CreateUserId = Convert.ToInt32(AppSettings.DefaultUserId);
                 await _systemService.InsertLogException(logException);
                 return BadRequest("Houve um erro");
             }
@@ -105,7 +107,8 @@ namespace ApiSchool.Controllers
         {
             try
             {
-                user = ProfileMappers.CreateUserMapper(user);
+                user.UpdateUserId = Convert.ToInt32(AppSettings.DefaultUserId);
+                user.UpdateTime = DateTime.Now;
                 await _profileService.CreateUser(user);
                 return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
             }
@@ -114,7 +117,7 @@ namespace ApiSchool.Controllers
                 LogExceptionModel logException = new LogExceptionModel();
                 logException.Error = ex.ToString() + Environment.NewLine;
                 logException.CreateTime = DateTime.Now;
-                logException.CreateUserId = Convert.ToInt32(AppStartUp.GetSettingsApp(AppSettingsKeys.DefaultUserId));
+                logException.CreateUserId = Convert.ToInt32(AppSettings.DefaultUserId);
                 await _systemService.InsertLogException(logException);
                 return BadRequest("Houve um erro");
             }
@@ -136,12 +139,12 @@ namespace ApiSchool.Controllers
                 return Ok(id);
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LogExceptionModel logException = new LogExceptionModel();
                 logException.Error = ex.ToString() + Environment.NewLine;
                 logException.CreateTime = DateTime.Now;
-                logException.CreateUserId = Convert.ToInt32(AppStartUp.GetSettingsApp(AppSettingsKeys.DefaultUserId));
+                logException.CreateUserId = Convert.ToInt32(AppSettings.DefaultUserId);
                 await _systemService.InsertLogException(logException);
                 return BadRequest("Houve um erro");
             }
@@ -152,18 +155,19 @@ namespace ApiSchool.Controllers
         {
             try
             {
-                userModified = ProfileMappers.CreateUserMapper(userModified);
+                userModified.UpdateUserId = Convert.ToInt32(AppSettings.DefaultUserId);
+                userModified.UpdateTime = DateTime.Now;
 
                 await _profileService.UpdateUser(userModified);
 
-                return CreatedAtAction(nameof(GetUserById), new {id = userModified.Id}, userModified);
+                return CreatedAtAction(nameof(GetUserById), new { id = userModified.Id }, userModified);
             }
             catch (Exception ex)
             {
                 LogExceptionModel logException = new LogExceptionModel();
                 logException.Error = ex.ToString() + Environment.NewLine;
                 logException.CreateTime = DateTime.Now;
-                logException.CreateUserId = Convert.ToInt32(AppStartUp.GetSettingsApp(AppSettingsKeys.DefaultUserId));
+                logException.CreateUserId = Convert.ToInt32(AppSettings.DefaultUserId);
                 await _systemService.InsertLogException(logException);
                 return BadRequest("Houve um erro");
             }

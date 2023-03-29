@@ -18,7 +18,11 @@ builder.Services.AddDbContext<Data_SystemDbContext>(options => options.UseMySql(
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<ISystemService, SystemService>();
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
-builder.Services.Configure<ConfigurationModel>(builder.Configuration.GetSection("Settings"));
+builder.Configuration.AddJsonFile("AppSettings.json",optional: true,reloadOnChange: true);
+AppSettingsSingleton? confifJson = new AppSettingsSingleton();
+builder.Configuration.Bind("AppSettings", confifJson);
+builder.Services.AddSingleton(confifJson);
+
 builder.Services.AddIdentity<UserModel, IdentityRole>().AddEntityFrameworkStores<Data_ProfileDbContext>().AddDefaultTokenProviders();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -55,9 +59,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        ValidIssuer = confifJson.Issuer,
+        ValidAudience = confifJson.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(confifJson.Key))
     };
 });
 
